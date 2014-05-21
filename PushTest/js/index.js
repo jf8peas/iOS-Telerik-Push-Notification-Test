@@ -16,7 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 var app = {
+    apnSuccessfulRegistration: function(token) {
+	    alert("Successfully got a token:" + token);
+	},
+    apnFailedRegistration: function(error) {
+    	alert("Error: " + error.toString());
+	},
+    pushInit: function() {
+        if (device.platform == "iOS") {
+            try {
+                var pN = window.plugins.pushNotification;
+                pN.register(app.apnSuccessfulRegistration,
+                            app.apnFailedRegistration, {
+                                "badge": "true",
+                                "sound": "true",
+                                "alert": "true",
+                                "ecb": "pushCallbacks.onNotificationAPN" //tell PushPlugin to call onNotificationAPN of global pushCallbacks object
+                            });
+            } catch(err) {
+                var text = "There was an error on this page.\n\n";
+                text += "Error description: " + err.message + "\n\n";
+                text += "Click OK to continue.\n\n";
+                alert(text);
+            }
+        }
+	},
     // Application Constructor
     initialize: function() {
         this.bindEvents();
@@ -33,6 +59,7 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
+        app.pushInit();
         app.receivedEvent('deviceready');
         navigator.splashscreen.hide();
     },
